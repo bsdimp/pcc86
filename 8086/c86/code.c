@@ -5,8 +5,8 @@
 
 int proflag;
 int strftn = 0;	/* is the current function one which returns a value */
-FILE *tmpfile;
-FILE *outfile = stdout;
+FILE *tfile;
+FILE *outfile;
 
 branch( n ){
 	/* output a branch to label n */
@@ -44,7 +44,7 @@ locctr( l ){
 
 	case STRNG:
 	case ISTRNG:
-		outfile = tmpfile;
+		outfile = tfile;
 		break;
 
 	case STAB:
@@ -228,7 +228,7 @@ where(c){ /* print location of error  */
 	fprintf( stderr, "%s, line %d: ", ftitle, lineno );
 	}
 
-char *tmpname = "/tmp/pcXXXXXX";
+char tname[] = "/tmp/pcXXXXXX";
 
 main( argc, argv ) char *argv[]; {
 	int dexit();
@@ -236,30 +236,31 @@ main( argc, argv ) char *argv[]; {
 	register int i;
 	int r;
 
+	outfile = stdout;
 	for( i=1; i<argc; ++i )
 		if( argv[i][0] == '-' && argv[i][1] == 'X' && argv[i][2] == 'p' ) {
 			proflag = 1;
 			}
 
-	mktemp(tmpname);
+	mktemp(tname);
 	if(signal( SIGHUP, SIG_IGN) != SIG_IGN) signal(SIGHUP, dexit);
 	if(signal( SIGINT, SIG_IGN) != SIG_IGN) signal(SIGINT, dexit);
 	if(signal( SIGTERM, SIG_IGN) != SIG_IGN) signal(SIGTERM, dexit);
-	tmpfile = fopen( tmpname, "w" );
+	tfile = fopen( tname, "w" );
 
 	r = mainp1( argc, argv );
 
-	tmpfile = freopen( tmpname, "r", tmpfile );
-	if( tmpfile != NULL )
-		while((c=getc(tmpfile)) != EOF )
+	tfile = freopen( tname, "r", tfile );
+	if( tfile != NULL )
+		while((c=getc(tfile)) != EOF )
 			putchar(c);
 	else cerror( "Lost temp file" );
-	unlink(tmpname);
+	unlink(tname);
 	return( r );
 	}
 
 dexit( v ) {
-	unlink(tmpname);
+	unlink(tname);
 	exit(1);
 	}
 
