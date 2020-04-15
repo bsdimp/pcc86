@@ -3,7 +3,9 @@ FILES = mical.h inst.h scan.c error.c init.c ins.c \
 
 OBJECTS = error.o init.o ins.o ps.o rel.o sdi.o sym.o scan.o
 
-CFLAGS = -O
+CFLAGS = -O -Wno-incompatible-library-redeclaration -Wno-implicit-int -Wno-implicit-function-declaration -Wno-return-type \
+	-Wno-parentheses -Wno-dangling-else -Wno-macro-redefined -Wno-knr-promoted-parameter \
+	-Wno-incompatible-pointer-types
 
 try:	ncvt86 xee.ld
 	ncvt86  xee.ld xee.com

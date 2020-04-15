@@ -26,11 +26,11 @@ nc86:	$(OBJ0) $(OBJ1) comm1.o nlocal2.o ntable.o
 	cc -g -o nc86 $(OBJ0) $(OBJ1) comm1.o nlocal2.o ntable.o
 
 nlocal2.o: local2.c
-	cc -c -O local2.c
+	cc ${CFLAGS} -c -O local2.c
 	mv local2.o nlocal2.o
 
 ntable.o: table.c
-	cc -c -O table.c
+	cc ${CFLAGS} -c -O table.c
 	mv table.o ntable.o
 
 comm1.o: manifest mfile1 common macdefs

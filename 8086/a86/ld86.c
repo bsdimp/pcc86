@@ -3,6 +3,7 @@ static	char sccsid[] = "@(#)ld.c 4.4 4/26/81";
  * ld - string table version for VAX
  */
 
+#include <errno.h>
 #include <sys/types.h>
 #include <signal.h>
 #include <stdio.h>
@@ -10,8 +11,28 @@ static	char sccsid[] = "@(#)ld.c 4.4 4/26/81";
 #include <ar.h>
 #include <a.out.h>
 #include <ranlib.h>
-#include <stat.h>
-#include <pagsiz.h>
+#include <sys/stat.h>
+//#include <pagsiz.h>
+
+#undef round
+
+#define cfree(x) free(x)
+#define PAGSIZ 4096
+#define BSIZE 4096
+#define BSHIFT 12
+#define BMASK (BSIZE-1)
+
+u_long
+round(v, r)
+	int v;
+	u_long r;
+{
+
+	r--;
+	v += r;
+	v &= ~(long)r;
+	return(v);
+}
 
 /*
  * Basic strategy:
@@ -969,8 +990,8 @@ struct	biobuf toutb;
 setupout()
 {
 	int bss;
-	extern char *sys_errlist[];
-	extern int errno;
+//	extern char *sys_errlist[];
+//	extern int errno;
 
 	ofilemode = 0777 & ~umask(0);
 	biofd = creat(ofilename, 0666 & ofilemode);
@@ -1226,7 +1247,7 @@ tracesym()
 		printf("(%s)", archdr.ar_name);
 	printf(": ");
 	if ((cursym.n_type&N_TYPE) == N_UNDF && cursym.n_value) {
-		printf("definition of common %s size %d\n",
+		printf("definition of common %s size %ld\n",
 		    cursym.n_un.n_name, cursym.n_value);
 		return;
 	}
@@ -1255,7 +1276,7 @@ tracesym()
  * each relocation datum address by our base position in the new segment.
  */
 load2td(creloc, position, b1, b2)
-	long creloc, offset;
+	long creloc;
 	struct biobuf *b1, *b2;
 {
 	register struct nlist *sp;
@@ -1807,16 +1828,6 @@ off_t loc;
 		error(1, "bad format");
 }
 
-round(v, r)
-	int v;
-	u_long r;
-{
-
-	r--;
-	v += r;
-	v &= ~(long)r;
-	return(v);
-}
 
 #define	NSAVETAB	8192
 char	*savetab;
@@ -1874,7 +1885,8 @@ top:
 			put = cnt;
 		bp->b_nleft -= put;
 		to = bp->b_ptr;
-		asm("movc3 r8,(r11),(r7)");
+//		asm("movc3 r8,(r11),(r7)");
+		bcopy(p, to, put);
 		bp->b_ptr += put;
 		p += put;
 		cnt -= put;
