@@ -1,5 +1,3 @@
-tape:
-	tar c READ.ME cc86 a86 c86 lib86 nlib86
+SUBDIRS=a86 c86 ld86 cvt86 ncvt86 nc86
 
-tape800:
-	tar cf /dev/rmt0 READ.ME cc86 a86 c86 lib86 nlib86
+.include <bsd.subdir.mk>
