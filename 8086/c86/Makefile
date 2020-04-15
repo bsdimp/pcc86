@@ -1,4 +1,5 @@
 # make clang like this old old code
+PROG=	c86
 CFLAGS=-O -g \
 	-Wno-array-bounds \
 	-Wno-comment \
@@ -10,33 +11,8 @@ CFLAGS=-O -g \
 	-Wno-parentheses \
 	-Wno-return-type
 
-OBJ0 = trees.o optim.o pftn.o code.o local.o scan.o xdefs.o cgram.o
-OBJ1 = reader.o order.o match.o allo.o
+SRCS= trees.c optim.c pftn.c code.c local.c scan.c xdefs.c cgram.y \
+	reader.c order.c match.c allo.c comm1.c local2.c table.c
+MAN1=
 
-c86:	$(OBJ0) $(OBJ1) comm1.o local2.o table.o
-	cc -g -o c86 $(OBJ0) $(OBJ1) comm1.o local2.o table.o
-
-local2.o: local2.c
-	cc ${CFLAGS} -c -O -DX8087 local2.c
-
-table.o: table.c
-	cc ${CFLAGS} -c -O -DX8087 table.c
-
-nc86:	$(OBJ0) $(OBJ1) comm1.o nlocal2.o ntable.o
-	cc -g -o nc86 $(OBJ0) $(OBJ1) comm1.o nlocal2.o ntable.o
-
-nlocal2.o: local2.c
-	cc ${CFLAGS} -c -O local2.c
-	mv local2.o nlocal2.o
-
-ntable.o: table.c
-	cc ${CFLAGS} -c -O table.c
-	mv table.o ntable.o
-
-comm1.o: manifest mfile1 common macdefs
-$(OBJ0): manifest macdefs mfile1
-$(OBJ1) local2.o nlocal2.o table.o ntable.o: manifest mfile2 mac2defs macdefs
-
-clean:
-
-	rm ${OBJ0} ${OBJ1}
+.include <bsd.prog.mk>
