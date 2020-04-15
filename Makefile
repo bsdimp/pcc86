@@ -1,3 +1,3 @@
-SUBDIRS=8086
+SUBDIR=8086
 
 .include <bsd.subdir.mk>
